@@ -1,0 +1,289 @@
+{include file='common/head.html'}
+
+<div class="layui-body">
+	{if([$list])}
+	<div class="layui-tab layui-tab-brief" lay-filter="tab">
+	  <ul class="layui-tab-title">
+	    <li class="layui-this" lay-id="t1">扩展字段列表</li>
+	    <li lay-id="t2">扩展字段新增</li>
+	  </ul>
+	  <div class="layui-tab-content">
+	  	   <div class="layui-tab-item layui-show">
+	  	   		<table class="layui-table">
+	            	<thead>
+	                    <tr>
+	                        <th>序号</th>
+	                        <th>内容模型</th>
+	                        <th>字段描述</th>
+	                        <th>字段名称</th>
+	                        <th>字段类型</th>
+	                        <th>排序</th>
+	                        <th>操作</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    {foreach $extfields(key,value)}
+	                    <tr>
+	                    	<td>[num]</td>
+	                    	<td>
+	                    		{foreach $models(key2,value2,num2)}	
+	                    		{php}
+	                    			$mcode = explode(',',$value->mcode);
+		                    		$mcode2 = $value2->mcode;
+		                    		if(in_array($mcode2,$mcode)){
+		                    			echo $value2->name;
+		                    		}
+			                	{/php} 
+			                	{/foreach}
+							</td>
+	                        <td>[value->description]</td>
+	                        <td>[value->name]</td>
+	                        <td>
+	                        	{if($value->type==1)}单行文本{/if}
+	                    		{if($value->type==2)}多行文本{/if}
+	                    		{if($value->type==3)}单选按钮{/if}
+	                    		{if($value->type==4)}多选按钮{/if}
+	                    		{if($value->type==5)}图片上传{/if}
+	                    		{if($value->type==6)}附件上传{/if}
+	                    		{if($value->type==7)}日期选择{/if}
+	                    		{if($value->type==8)}编辑器{/if}
+	                    		{if($value->type==9)}下拉选择{/if}
+	                    		{if($value->type==10)}轮播多图{/if}
+	                    		{if($value->type==11)}单选关联{/if}
+	                    		{if($value->type==12)}多选关联{/if}
+	                    		{if($value->type==13)}属性名&值{/if}
+						</td>
+						<td>[value->sorting]</td>
+	                         <td>
+	                            {fun=get_btn_del($value->id)}
+	                            {fun=get_btn_mod($value->id)}
+	                         </td>
+	                    </tr>
+	                    {/foreach}
+	                </tbody>
+	            </table>
+	            <div class="page">{$pagebar}</div>
+	  	   </div>
+	  	   
+	  	    <div class="layui-tab-item">
+	   			<form action="{url./admin/ExtField/add}" method="post" class="layui-form">
+	   				<input type="hidden" name="formcheck" value="{$formcheck}" > 
+	   				<div class="layui-form-item">
+	                     <label class="layui-form-label">内容模型</label>
+	                     <div class="layui-input-block">
+	            			{foreach $models(key,value)}						
+		                    <input type="checkbox" value="[value->mcode]" title="[value->name]" name="mcode[]">
+		                    {/foreach}
+	                     </div>
+	                </div>
+	                
+	                <div class="layui-form-item">
+	                     <label class="layui-form-label">字段描述</label>
+	                     <div class="layui-input-block">
+	                     	<input type="text" name="description" required lay-verify="required"  placeholder="请输入字段描述，如：产品价格" class="layui-input">
+	                     </div>
+	                </div>
+	                
+	                <div class="layui-form-item">
+	                     <label class="layui-form-label">字段名称</label>
+	                     <div class="layui-input-block">
+	                     	<input type="text" name="name" required maxlength="20" lay-verify="required"  placeholder="请输入字段名称,字母、数组、下划线，如：price" class="layui-input">
+	                     </div>
+	                </div>
+	                
+	                <div class="layui-form-item">
+	                     <label class="layui-form-label">字段类型</label>
+	                     <div class="layui-input-block">
+	                     	 <select name="type" lay-verify="required" lay-filter="demo">
+		                    	<option value="1">单行文本</option>
+		                    	<option value="2">多行文本</option>
+		                    	<option value="3">单选按钮</option>
+		                    	<option value="4">多选按钮</option>
+		                    	<option value="5">图片上传</option>
+		                    	<option value="6">附件上传</option>
+		                    	<option value="7">日期选择</option>
+		                    	<option value="8">编辑器</option>
+		                    	<option value="9">下拉选择</option>
+		                    	<option value="10">轮播多图</option>
+		                    	<option value="11">单选关联</option>
+		                    	<option value="12">多选关联</option>
+		                    	<option value="13">属性名&值</option>
+		                    </select>
+	                     </div>
+	                </div>
+	                
+	                <div class="layui-form-item btnvalue">
+	                     <label class="layui-form-label">选择按钮值</label>
+	                     <div class="layui-input-block">
+	                     	<textarea name="value" placeholder="多个选项用逗号隔开或者回车"  class="layui-textarea"></textarea>
+	                     	<div class="layui-form-mid layui-word-aux">只在类型为单选或多选时填写有效。</div>
+	                     </div>
+	                </div>
+	                <div class="layui-form-item layui-hide btnselect">
+	                     <label class="layui-form-label">选择关联栏目</label>
+	                     <div class="layui-input-block">
+	                     	<select name="value-temp">
+                                <option value="">请选择栏目</option>
+                                 {$sort_select}
+                            </select>
+	                     </div>
+	                </div>
+	                
+	                <div class="layui-form-item">
+	                     <label class="layui-form-label">排序</label>
+	                     <div class="layui-input-block">
+	                     	<input type="text" name="sorting" required lay-verify="required" value="255" placeholder="请输入排序"  class="layui-input">
+	                     </div>
+	                </div>
+		   			
+	   				<div class="layui-form-item">
+						 <div class="layui-input-block">
+						    <button class="layui-btn" lay-submit>立即提交</button>
+						    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+						 </div>
+					</div>
+	   			</form>
+	   	 	</div>
+	   </div>
+	 </div>
+	{/if} 
+	
+	{if([$mod])}
+	<div class="layui-tab layui-tab-brief" lay-filter="tab">
+	  <ul class="layui-tab-title">
+	    <li class="layui-this">扩展字段修改</li>
+	  </ul>
+	  <div class="layui-tab-content">
+	  	<div class="layui-tab-item layui-show">
+	  		<form action="{url./admin/ExtField/mod/id/'.[$get.id].'}{$backurl}" method="post" class="layui-form">
+	  			<input type="hidden" name="formcheck" value="{$formcheck}" > 
+	  			<div class="layui-form-item">
+                     <label class="layui-form-label">内容模型</label>
+                     <div class="layui-input-block">
+	                    {foreach $models(key,value)}	
+	                    {php}
+      					$checkboxs=explode(',',[$extfield->mcode]);
+      					$value2 = $value->mcode;
+      					$name2 = $value->name;
+	 					if(in_array($value2,$checkboxs)){
+								echo '<input type="checkbox" name="mcode[]" value="'.$value2.'" title="'.$name2.'" checked>';
+							}else{
+								echo '<input type="checkbox" name="mcode[]" value="'.$value2.'" title="'.$name2.'">';
+							}
+				     {/php}
+				     {/foreach}
+                     </div>
+                </div>
+                
+                <div class="layui-form-item">
+                     <label class="layui-form-label">字段描述</label>
+                     <div class="layui-input-block">
+                     	<input type="text" name="description"  value="{$extfield->description}" placeholder="请输入字段描述，如：产品价格" class="layui-input">
+                     </div>
+                </div>
+                
+                <div class="layui-form-item">
+                     <label class="layui-form-label">字段名称</label>
+                     <div class="layui-input-block">
+                     	<input type="text" name="name" readonly value="{$extfield->name}" maxlength="20" placeholder="请输入字段名称，字母、数组、下划线，如：price" class="layui-input readonly">
+                     </div>
+                </div>
+                
+                <div class="layui-form-item">
+                     <label class="layui-form-label">字段类型</label>
+                     <div class="layui-input-block">
+                     	 <select name="type" lay-verify="required">
+	                    	{if([$extfield->type]==2)}
+	                    		<option value="2" selected>多行文本</option>
+	                    	{/if}
+	                    	
+	                    	{if([$extfield->type]==7)}
+	                    		<option value="7" selected>日期选择</option>
+	                    	{/if}
+	                    	
+	                    	{if([$extfield->type]==8)}
+	                    		<option value="8" selected>编辑器</option>
+	                    	{/if}
+
+	                    	{if([$extfield->type]==10)}
+	                    		<option value="10" selected>轮播多图</option>
+	                    	{/if}
+	                    	
+	                    	{if([$extfield->type]!=2 && [$extfield->type]!=7 && [$extfield->type]!=8 && [$extfield->type]!=10 && [$extfield->type]!=11 && [$extfield->type]!=12)}
+	                    		<option value="1" {if([$extfield->type]==1)}selected{/if}>单行文本</option>
+	                    		<option value="3" {if([$extfield->type]==3)}selected{/if}>单选按钮</option>
+	                    		<option value="4" {if([$extfield->type]==4)}selected{/if}>多选按钮</option>
+	                    		<option value="5" {if([$extfield->type]==5)}selected{/if}>图片上传</option>
+	                    		<option value="6" {if([$extfield->type]==6)}selected{/if}>附件上传</option>
+	                    		<option value="9" {if([$extfield->type]==9)}selected{/if}>下拉选择</option>
+	                    		<option value="13" {if([$extfield->type]==13)}selected{/if}>属性名&值</option>
+	                    	{/if}
+	                    	{if([$extfield->type]==11 || [$extfield->type]==12)}
+	                    		<option value="11" {if([$extfield->type]==11)}selected{/if}>单选关联</option>
+	                    		<option value="12" {if([$extfield->type]==12)}selected{/if}>多选关联</option>
+	                    	{/if}
+	                    </select>
+                     </div>
+                </div>
+                {if([$extfield->type]!=11 && [$extfield->type]!=12)}
+                <div class="layui-form-item">
+                     <label class="layui-form-label">选择按钮值</label>
+                     <div class="layui-input-block">
+                     	<textarea name="value" placeholder="多个选项用逗号或回车隔开"  class="layui-textarea">{$extfield->value}</textarea>
+                     	<div class="layui-form-mid layui-word-aux">只在类型为单选或多选时填写有效，多个选项用逗号或回车隔开。</div>
+                     </div>
+                </div>
+                {else}
+                 <div class="layui-form-item ">
+	                     <label class="layui-form-label">选择关联栏目</label>
+	                     <div class="layui-input-block">
+	                     	<select name="value">
+                                <option value="">请选择栏目</option>
+                                 {$sort_select}
+                            </select>
+	                     </div>
+	                </div>
+                {/if}
+                <div class="layui-form-item">
+                     <label class="layui-form-label">排序</label>
+                     <div class="layui-input-block">
+                     	<input type="text" name="sorting" required lay-verify="required" value="{$extfield->sorting}" placeholder="请输入排序"  class="layui-input">
+                     </div>
+                </div>
+   			
+   				<div class="layui-form-item">
+					 <div class="layui-input-block">
+					    <button class="layui-btn" lay-submit>立即提交</button>
+					    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+					    {fun=get_btn_back()}
+					 </div>
+				</div>
+	  		</form>
+	  	</div>
+	  </div>
+	 </div>
+	{/if} 
+</div>
+{include file='common/foot.html'}
+<script type="text/javascript">
+	layui.use(['layer', 'jquery', 'form'], function () {
+			var layer = layui.layer,
+				$ = layui.jquery,
+				form = layui.form;
+ 
+			form.on('select(demo)', function(data){
+				if(data.value == 11 ||data.value == 12){
+					$(".btnvalue").addClass('layui-hide');
+					$(".btnselect").removeClass('layui-hide').addClass('layui-show');
+					$(".btnselect").find('select').prop('name','value');
+					form.render('select');
+				}else{
+				   	$(".btnselect").removeClass('layui-show').addClass('layui-hide');
+				   	$(".btnselect").find('select').prop('name','value-temp');
+					$(".btnvalue").removeClass('layui-hide');
+					$(".btnvalue").find('textarea').prop('name','value');
+					form.render('select'); 
+				}
+			});
+		});
+</script>

@@ -1,0 +1,183 @@
+{include file='common/head.html'}
+<div class="layui-body" style="padding:0;">
+    <div class="ui-layout-west area manage-area" id="manage_area">
+        <div id="tree" class="ztree"></div>
+    </div>
+    <div class="ui-layout-center" style="position: relative; padding-bottom:80px;">
+        <ul class="tabs" style="position: absolute; bottom:15px; right:40px;">
+            <!-- <li id="saveBtn">上传图片</li> -->
+            <button type="button" class="layui-btn uploadmuti" data-des="pics">
+                <i class="layui-icon">&#xe67c;</i>上传多图
+            </button>
+        </ul>
+        <iframe name="content_body" id="content_body" src="{url./admin/Media/get_images_path/pagesize/30/flag/1/num/'.[$info.num].'/func/'.[$info.func].'}" width="100%" height="100%" frameborder="0"></iframe>
+    </div>
+</div>
+{include file='common/foot.html'}
+<link rel="stylesheet" type="text/css" href="{APP_THEME_DIR}/js/plugins/webuploader/css/style.css?v=1.0">
+<link rel="stylesheet" href="{APP_THEME_DIR}/js/plugins/ztree/css/iframe.css?v=1.0">
+<link rel="stylesheet" href="{APP_THEME_DIR}/js/plugins/ztree/css/zTreeStyle/zTreeStyle.css?v=1.0" type="text/css">
+<script src="{APP_THEME_DIR}/js/jquery.layout-latest.min.js?v=1.0"></script>
+<script type="text/javascript" src="{APP_THEME_DIR}/js/plugins/ztree/js/jquery.ztree.core.min.js?v=1.0"></script>
+<script type="text/javascript">
+    var myLayout;
+    jQuery(document).ready(function () {
+        myLayout = jQuery(".layui-body").layout({
+        /*  全局配置 */
+            closable:                   true    /* 是否显示点击关闭隐藏按钮*/
+        ,   resizable:                  true    /* 是否允许拉动*/
+        ,   maskContents:               true    /* 加入此参数，框架内容页就可以拖动了*/
+        /*  顶部配置 */
+        ,   north__spacing_open:        0       /* 顶部边框大小*/
+        /*  底部配置 */
+        ,   south__spacing_open:        0       /* 底部边框大小*/
+        /*  some pane-size settings*/
+        ,   west__minSize:              200     /*左侧最小宽度*/
+        ,   west__maxSize:              500     /*左侧最大宽度*/
+        /*  左侧配置 */
+        ,   west__slidable:             false
+        ,   west__animatePaneSizing:    false
+        ,   west__fxSpeed_size:         "slow"  /* 'fast' animation when resizing west-pane*/
+        ,   west__fxSpeed_open:         1000    /* 1-second animation when opening west-pane*/
+        ,   west__fxSettings_open:      { easing: "easeOutBounce" } // 'bounce' effect when opening*/
+        ,   west__fxName_close:         "none"  /* NO animation when closing west-pane*/
+        ,   stateManagement__enabled:   false   /*是否读取cookies*/
+        ,   showDebugMessages:          false 
+        }); 
+    });
+
+    var zNodes = {$zNodes};
+
+    var setting = {
+        view:{
+            dblClickExpand:false
+            ,showLine:true
+        },
+        data:{
+            simpleData:{
+                enable:true
+            }
+        },
+        callback:{
+            beforeExpand:beforeExpand
+            ,onExpand:onExpand
+            ,onClick:onClick
+        }
+    };
+    var curExpandNode=null;
+    function beforeExpand(treeId,treeNode) {
+        var pNode=curExpandNode?curExpandNode.getParentNode():null;
+        var treeNodeP=treeNode.parentTId?treeNode.getParentNode():null;
+        var zTree=$.fn.zTree.getZTreeObj("tree");
+        for(var i=0,l=!treeNodeP?0:treeNodeP.children.length;i<l; i++){
+            if(treeNode!==treeNodeP.children[i]){zTree.expandNode(treeNodeP.children[i],false);}
+        };
+        while (pNode){
+            if(pNode===treeNode){break;}
+            pNode=pNode.getParentNode();
+        };
+        if(!pNode){singlePath(treeNode);}
+    };
+    function singlePath(newNode) {
+        if (newNode === curExpandNode) return;
+        if (curExpandNode && curExpandNode.open==true) {
+            var zTree = $.fn.zTree.getZTreeObj("tree");
+            if (newNode.parentTId === curExpandNode.parentTId) {
+                zTree.expandNode(curExpandNode, false);
+            } else {
+                var newParents = [];
+                while (newNode) {
+                    newNode = newNode.getParentNode();
+                    if (newNode === curExpandNode) {
+                        newParents = null;
+                        break;
+                    } else if (newNode) {
+                        newParents.push(newNode);
+                    }
+                }
+                if (newParents!=null) {
+                    var oldNode = curExpandNode;
+                    var oldParents = [];
+                    while (oldNode) {
+                        oldNode = oldNode.getParentNode();
+                        if (oldNode) {
+                            oldParents.push(oldNode);
+                        }
+                    }
+                    if (newParents.length>0) {
+                        zTree.expandNode(oldParents[Math.abs(oldParents.length-newParents.length)-1], false);
+                    } else {
+                        zTree.expandNode(oldParents[oldParents.length-1], false);
+                    }
+                }
+            }
+        }
+        curExpandNode = newNode;
+    };
+    function onExpand(event,treeId,treeNode){curExpandNode=treeNode;};
+    function onClick(e,treeId,treeNode){
+        var zTree=$.fn.zTree.getZTreeObj("tree");
+        zTree.expandNode(treeNode,null,null,null,true);
+    }
+    $(function(){
+        $.fn.zTree.init($("#tree"),setting,zNodes);
+        $(".ui-layout-north li:first-child").click();
+    });
+</script>
+<script type="text/javascript">
+    layui.use(['element','upload'], function(){
+      var element = layui.element;
+      var upload = layui.upload;
+    
+      var sitedir=$('#sitedir').data('sitedir');
+      var uploadurl = $("#preurl").data('preurl')+'/index/upload';
+      //执行多图片上传实例
+      var files='';
+    //   var html='';
+      var uploadsInst = upload.render({
+        elem: '.uploadmuti' //绑定元素
+        ,url: uploadurl //上传接口
+        ,field: 'upload' //字段名称
+        ,multiple: true//多文件上传
+        ,accept: 'images' //接收文件类型 images（图片）、file（所有文件）、video（视频）、audio（音频）
+        ,acceptMime: 'image/*'
+        ,before: function(obj){ 
+           layer.load(); //上传loading
+        }
+        ,done: function(res){
+           if(res.code==1){
+            if(files){
+                files+=','+res.data[0];
+            }else{
+                files+=res.data[0];
+            }
+            //    html += "<dl><dt><img src='"+sitedir+res.data[0]+"' data-url='"+res.data[0]+"'></dt><dd>删除</dd></dl>";
+           }else{
+               layer.msg('有文件上传失败：'+res.data); 
+           } 
+        }
+          ,allDone: function(obj){
+              var item = this.item;
+              var des=$(item).data('des');
+              layer.closeAll('loading'); //关闭loading
+            if(files!=''){
+                var files = '/abc/acb.jpg,/aaa/abc.png';
+                var folder = files.substr(0,files.indexOf(','));
+                folder = folder.substr(0,folder.lastIndexOf('/')+1);
+                layer.msg('成功上传'+obj.successful+'个文件！',{time:500},function(){
+                    //location.href='{url./admin/Media/media_list}&images_path='+folder;
+                    location.reload();
+                });
+                files='';
+                //html='';
+            }else{
+                layer.msg('全部上传失败！'); 
+            }
+         }
+        ,error: function(){
+            layer.closeAll('loading'); //关闭loading
+            layer.msg('上传发生错误！'); 
+        }
+      });
+    });
+</script>

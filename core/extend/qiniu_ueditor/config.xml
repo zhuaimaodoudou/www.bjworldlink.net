@@ -1,0 +1,9 @@
+﻿<?xml version="1.0"?>
+<app>
+	<name>Ueditor编辑器</name>
+	<version>v1.0.0.20160524</version>
+	<users>1</users>
+	<author>puyuetian</author>
+	<link>http://www.hadsky.com</link>
+	<description>百度的Ueditor编辑器，由蒲乐天整合，功能很屌，但不兼容手机端和部分IE系列浏览器。</description>
+</app>

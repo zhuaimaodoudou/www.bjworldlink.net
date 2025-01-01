@@ -1,0 +1,91 @@
+
+<div class="footer-widgets woocommerce">
+    <div class="container">
+        <div class="footer-widgets-wraper">
+
+            <div class="col-md-3">
+                <div class="footer-col">
+                    <div class="widget-title">
+                        {pboot:sort scode=1}
+                        <h3 class="title">[sort:name]</h3>
+                        {/pboot:sort}
+
+                    </div>
+                    <ul>
+                        {pboot:nav parent=1}
+                        <li class="page_item page-item-2764"><a href="[nav:link]">[nav:name]</a></li>
+                        {/pboot:nav}
+
+
+
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="footer-col">
+                    <div class="widget-title">
+                        {pboot:sort scode=7}
+                        <h3 class="title">[sort:name]</h3>
+                        {/pboot:sort}
+
+                    </div>
+                    <ul>
+                        {pboot:nav parent=7}
+                        <li class="page_item page-item-2764"><a href="[nav:link]">[nav:name]</a></li>
+                        {/pboot:nav}
+
+
+
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="footer-col">
+                    <div class="widget-title">
+                        {pboot:sort scode=15}
+                        <h3 class="title">ABOUT  &nbsp; US</h3>
+                        {/pboot:sort}
+
+                    </div>
+                    <ul>
+                        {pboot:sort scode=14,15,16}
+                        <li class="page_item page-item-2764"><a href="[sort:link]">[sort:name]</a></li>
+                        {/pboot:sort}
+
+
+
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-3" style="    padding: 0;">
+                <div class="footer-col">
+                    <div class="widget-title">
+                        <h3 class="title">Working&nbsp; Hours</h3>
+                    </div>
+                    <ul>
+                        <li class="page_item page-item-2764"><a>Mon to Fri 09:00 – 18:30 PST</a></li>
+                        <li class="page_item page-item-2764"><a>Email： {pboot:companyemail}</a></li>
+                        <li class="page_item page-item-2764"><a>What’s App： {pboot:companyphone}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="footer-bar" class="footer-bar">
+    <div class="container">
+        <div class="footerbar">
+            {pboot:sitecopyright} | <a href="https://beian.miit.gov.cn/">{pboot:if('{pboot:siteicp}')}
+            {pboot:siteicp}
+            {/pboot:if}</a></div>
+    </div>
+</div>
+<p id="back-to-top"><a href="#top"><span><i class="fa fa-angle-up fa-lg"></i><br>TOP</span></a></p>
+
+
+ <script type="text/javascript" charset="utf-8">
+//     $('.menu-item-object-page').mouseover(function(){
+//         $(this).addClss('open')
+//     })
+    
+// </script>

@@ -1,0 +1,213 @@
+{include file='common/head.html'}
+<div class="layui-body">
+	{if([$list])}
+	<div class="layui-tab layui-tab-brief" lay-filter="tab">
+		<ul class="layui-tab-title">
+			<li class="layui-this" lay-id="t1">留言列表</li>
+		</ul>
+		<div class="layui-tab-content">
+			<div class="layui-tab-item layui-show">
+				<form action="{url./admin/Message/index}" method="get" class="layui-form">
+					<div class="layui-form-item nospace">
+						<div class="layui-input-inline">
+							{$pathinfo}
+							<select name="field">
+								<option value="">全部</option>
+								{foreach $fields(key,value)}
+								<option value="[value->name]">[value->description]</option>
+								{/foreach}
+							</select>
+						</div>
+						<div class="layui-input-inline">
+							<input type="text" name="keyword" value="{$get.keyword}" placeholder="请输入搜索关键字"
+								class="layui-input">
+						</div>
+						<div class="layui-input-inline">
+							<button class="layui-btn" lay-submit>搜索</button>
+							<a class="layui-btn layui-btn-primary" href="{url./admin/Message/index}">清除搜索</a>
+						</div>
+					</div>
+				</form>
+
+				<form action="{url./admin/Message/index}" method="post" id="contentForm" name="contentForm"
+					class="layui-form" onkeydown="if(event.keyCode==13) return false;">
+					<input type="hidden" name="formcheck" value="{$formcheck}">
+					<table class="layui-table">
+						<thead>
+							<tr>
+								<th style="width:20px"><input type="checkbox" class="checkbox" lay-ignore id="checkall"
+										title="全选"></th>
+								<th style="width:30px">序号</th>
+								{foreach $fields(key,value)}
+								{if($value->status)}
+								<th>[value->description]</th>
+								{/if}
+								{/foreach}
+								<th>留言时间</th>
+								<th>审核</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							{foreach $messages(key,value,num)}
+							<tr>
+								<td>
+									<input type="checkbox" class="checkbox checkitem" lay-ignore name="list[]"
+										value="[value->id]">
+									<input type="hidden" name="listall[]" value="[value->id]">
+								</td>
+								<td>[num]</td>
+								{foreach $fields(key2,value2,num2)}
+								{if($value2->status)}
+								{php} $type=$value2->type {/php}
+								{php} $field=$value2->name {/php}
+								{if($type == 'img' && $value->$field!='')}
+								<td>
+									<a href="[value->$field]" target="_blank">
+										<img src="[value->$field]" alt="">
+									</a>
+								</td>
+								{/if}
+								{if($type == 'file' && $value->$field!='')}
+								<td>
+									<a href="[value->$field]" target="_blank">查看附件</a>
+								</td>
+								{/if}
+
+								{if($type == 'text' && $value->$field!='')}
+								<td>[value->$field]</td>
+								{/if}
+								{/if}
+								{/foreach}
+								<td>
+									[value->create_time]
+								</td>
+								<td>
+									{if($value->status)}
+									<a href="{url./admin/'.C.'/mod/id/'.$value->id.'/field/status/value/0}"><i
+											class='fa fa-toggle-on' title="点击前端隐藏"
+											style="vertical-align:middle"></i></a>
+									{else}
+									<a href="{url./admin/'.C.'/mod/id/'.$value->id.'/field/status/value/1}"><i
+											class='fa fa-toggle-off' title="点击前端显示"
+											style="vertical-align:middle"></i></a>
+									{/if}
+								</td>
+								<td>
+									{fun=get_btn_mod($value->id,'id','详情&回复')}
+									{fun=get_btn_del($value->id)}
+								</td>
+							</tr>
+							{/foreach}
+						</tbody>
+					</table>
+
+					<div class="layui-btn-group">
+						{if(check_level('del'))}
+						<button type="submit" name="submit" onclick="return setDelAction();"
+							class="layui-btn layui-btn-sm">批量删除</button>
+						{/if}
+						{if(session('ucode')==10001 && [$messages])}
+						<a href="{url./admin/Message/clear}" onclick='return confirm("您确定要清空么？")'
+							class="layui-btn layui-btn-sm">清空全部记录</a>
+						{/if}
+						{if([$messages])}
+						<a href="{url./admin/Message/index/export/1}" class="layui-btn layui-btn-sm">导出全部记录</a>
+						{/if}
+					</div>
+					<script>
+						function setDelAction() {
+							document.contentForm.action = "{url./admin/Message/del}";
+							return confirm("您确定要删除选中的内容么？");
+						}
+					</script>
+
+					<div class="page">
+						{$pagebar}
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	{/if}
+	{if([$mod])}
+	<div class="layui-tab layui-tab-brief" lay-filter="tab">
+		<ul class="layui-tab-title">
+			<li class="layui-this">留言详情</li>
+		</ul>
+		<div class="layui-tab-content">
+			<div class="layui-tab-item layui-show">
+				<form action="{url./admin/Message/mod/id/'.[$get.id].'}{$backurl}" method="post" class="layui-form">
+					<input type="hidden" name="formcheck" value="{$formcheck}">
+					<table class="layui-table table-two">
+						<thead>
+						</thead>
+						<tbody>
+							{foreach $fields(key,value)}
+							<tr>
+								<th>[value->description]</th>
+								{php} $field=$value->name {/php}
+								{php} $type=$value->type {/php}
+								{if($type == 'file' && [$message->$field]!='')}
+								<td><a href="{$message->$field}" target="_blank">点击查看</a></td>
+								{/if}
+								{if($type == 'img' && [$message->$field]!='')}
+								<td><a href="{$message->$field}">
+									<img src="{$message->$field}" target="_blank" alt="">
+								</a></td>
+								{/if}
+								{if($type == 'text' && [$message->$field]!='')}
+								<td>{$message->$field}</td>
+								{/if}
+							</tr>
+							{/foreach}
+							<tr>
+								<th>时间</th>
+								<td>{$message->create_time}</td>
+							</tr>
+							<tr>
+								<th>访客信息</th>
+								<td>
+									IP:<a
+										href="http://ip.taobao.com/ipSearch.html?ipAddr={fun=long2ip($value->user_ip)}"
+										target="_blank" title="点击查看归属地">{fun=long2ip([$message->user_ip])}</a>；
+									浏览器:{$message->user_bs}；
+									操作系统:{$message->user_os}
+								</td>
+							</tr>
+							{if([$message->username])}
+							<tr>
+								<th>会员账号</th>
+								<td>{$message->username}({$message->nickname})</td>
+							</tr>
+							{/if}
+							<tr>
+								<th>回复内容</th>
+								<td><textarea name="recontent" placeholder="请输入回复内容"
+										class="layui-textarea">{$message->recontent}</textarea></td>
+							</tr>
+							<tr>
+								<th>状态</th>
+								<td>
+									<input type="radio" name="status" value="1" title="显示"
+										{if([$message->status]==1)}checked="checked"{/if}>
+									<input type="radio" name="status" value="0" title="隐藏"
+										{if([$message->status]==0)}checked="checked"{/if}>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="layui-form-item">
+						<div class="layui-input-block">
+							<button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+							<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+							{fun=get_btn_back()}
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	{/if}
+</div>
+{include file='common/foot.html'}

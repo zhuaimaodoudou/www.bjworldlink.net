@@ -1,0 +1,45 @@
+<!-- 这是html演示代码，很简单的 -->
+<!-- <form>
+	<input type="hidden" name="files" id="">
+	<input type="file" class="upload-file">
+	<button type="button">提交</button>
+</form> -->
+
+
+
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>
+	// 回调函数，将数据传到哪里（默认，可以修改）
+	function callback(data) {
+		$("input[name='files']").val(data);
+	}
+	// 点击按钮进行的处理（默认，可以修改）
+	$(".upload-file").on("change", async function () {
+		fileUpload(this);
+	})
+
+
+	// 上传函数（可以不用修改）
+	async function fileUpload(that) {
+		const isMultiple = $(that).attr("multiple");
+		// 数据结果
+		let ResResult = "";
+		// 多文件内容
+		let dataArr = []
+		const upload = that.files;
+		const result = await axios.post("/index.php?p=/index/upload", {
+			upload
+		}, {
+			headers: {
+				"Content-Type": "multipart/form-data"
+			}
+		});
+		if (result && result.data.code == 1) {
+			dataArr = result.data.data;
+			ResResult = dataArr.join(",");
+			callback(ResResult)
+			// 这里来
+		}
+	}
+</script>

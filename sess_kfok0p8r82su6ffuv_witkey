@@ -1,0 +1,68 @@
+<?php
+//对GET POST 	提交方式进行有效拦截防外部注入 XSS跨站攻击执行代码  COOKIE进行非法过滤
+$referer=empty($_SERVER['HTTP_REFERER']) ? array() : array($_SERVER['HTTP_REFERER']);
+function customError($errno, $errstr, $errfile, $errline)
+{ 
+	echo "<b>Error number:</b> [$errno],error on line $errline in $errfile<br />";
+	die();
+}
+set_error_handler("customError",E_ERROR);
+$strurl= $_SERVER["REQUEST_URI"];
+$pattern_url = "/(login|admin)/is"; //排除后台,前台英文符号替换为中文符号
+$getfilter="think|application|site.php|,\\\|\\\x|runtime|wwwroot|shell|phpinfo|phpcode|copy\\(|127.0.0.1|localhost|vale\\(|assert\\(|<sCrIpt|eval\\(|base64_decode\\(|\\';|\";|\\..\\/..\\/|\\<.+javascript:window\\[.{1}\\\\x|<.*=(&#\\d+?;?)+?>|<.*(data|src)=data:text\\/html.*>|\\b(alert\\(|confirm\\(|expression\\(|prompt\\(|benchmark\s*?\(.*\)|sleep\s*?\(.*\)|\\b(group_)?concat[\\s\\/\\*]*?\\([^\\)]+?\\)|\bcase[\s\/\*]*?when[\s\/\*]*?\([^\)]+?\)|load_file\s*?\\()|<[a-z]+?\\b[^>]*?\\bon([a-z]{4,})\s*?=|^\\+\\/v(8|9)|\\b(and|or)\\b\\s*?([\\(\\)'\"\\d]+?=[\\(\\)'\"\\d]+?|[\\(\\)'\"a-zA-Z]+?=[\\(\\)'\"a-zA-Z]+?|>|<|\s+?[\\w]+?\\s+?\\bin\\b\\s*?\(|\\blike\\b\\s+?[\"'])|\\/\\*.*\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT\s*(\(.+\)\s*|@{1,2}.+?\s*|\s+?.+?|(`|'|\").*?(`|'|\")\s*)|UPDATE\s*(\(.+\)\s*|@{1,2}.+?\s*|\s+?.+?|(`|'|\").*?(`|'|\")\s*)SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE)@{0,2}(\\(.+\\)|\\s+?.+?\\s+?|(`|'|\").*?(`|'|\"))FROM(\\(.+\\)|\\s+?.+?|(`|'|\").*?(`|'|\"))|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)";
+$postfilter="think|application|site.php|,\\\|\\\x|runtime|wwwroot|shell|phpinfo|phpcode|copy\\(|127.0.0.1|localhost|vale\\(|assert\\(|<sCrIpt|eval\\(|base64_decode\\(|\\';|\";|\\..\\/..\\/|<.*=(&#\\d+?;?)+?>|<.*data=data:text\\/html.*>|\\b(alert\\(|confirm\\(|expression\\(|prompt\\(|benchmark\s*?\(.*\)|sleep\s*?\(.*\)|\\b(group_)?concat[\\s\\/\\*]*?\\([^\\)]+?\\)|\bcase[\s\/\*]*?when[\s\/\*]*?\([^\)]+?\)|load_file\s*?\\()|<[^>]*?\\b(onerror|onmousemove|onload|onclick|onmouseover)\\b|\\b(and|or)\\b\\s*?([\\(\\)'\"\\d]+?=[\\(\\)'\"\\d]+?|[\\(\\)'\"a-zA-Z]+?=[\\(\\)'\"a-zA-Z]+?|>|<|\s+?[\\w]+?\\s+?\\bin\\b\\s*?\(|\\blike\\b\\s+?[\"'])|\\/\\*.*\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT\s*(\(.+\)\s*|@{1,2}.+?\s*|\s+?.+?|(`|'|\").*?(`|'|\")\s*)|UPDATE\s*(\(.+\)\s*|@{1,2}.+?\s*|\s+?.+?|(`|'|\").*?(`|'|\")\s*)SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE)(\\(.+\\)|\\s+?.+?\\s+?|(`|'|\").*?(`|'|\"))FROM(\\(.+\\)|\\s+?.+?|(`|'|\").*?(`|'|\"))|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)";
+$refererfilter="\\<.+javascript:window\\[.{1}\\\\x|<.*=(&#\\d+?;?)+?>|<.*(data|src)=data:text\\/html.*>|\\b(alert\\(|confirm\\(|expression\\(|prompt\\(|benchmark\s*?\(.*\)|sleep\s*?\(.*\)|\\b(group_)?concat[\\s\\/\\*]*?\\([^\\)]+?\\)|\bcase[\s\/\*]*?when[\s\/\*]*?\([^\)]+?\)|load_file\s*?\\()|<[a-z]+?\\b[^>]*?\\bon([a-z]{4,})\s*?=|^\\+\\/v(8|9)|\\b(and|or)\\b\\s*?([\\(\\)'\"\\d]+?=[\\(\\)'\"\\d]+?|[\\(\\)'\"a-zA-Z]+?=[\\(\\)'\"a-zA-Z]+?|>|<|\s+?[\\w]+?\\s+?\\bin\\b\\s*?\(|\\blike\\b\\s+?[\"'])|\\/\\*.*\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT\s*(\(.+\)\s*|@{1,2}.+?\s*|\s+?.+?|(`|'|\").*?(`|'|\")\s*)|UPDATE\s*(\(.+\)\s*|@{1,2}.+?\s*|\s+?.+?|(`|'|\").*?(`|'|\")\s*)SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE)@{0,2}(\\(.+\\)|\\s+?.+?\\s+?|(`|'|\").*?(`|'|\"))FROM(\\(.+\\)|\\s+?.+?|(`|'|\").*?(`|'|\"))|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)";
+$cookiefilter="benchmark\s*?\(.*\)|sleep\s*?\(.*\)|load_file\s*?\\(|\\b(and|or)\\b\\s*?([\\(\\)'\"\\d]+?=[\\(\\)'\"\\d]+?|[\\(\\)'\"a-zA-Z]+?=[\\(\\)'\"a-zA-Z]+?|>|<|\s+?[\\w]+?\\s+?\\bin\\b\\s*?\(|\\blike\\b\\s+?[\"'])|\\/\\*.*\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT\s*(\(.+\)\s*|@{1,2}.+?\s*|\s+?.+?|(`|'|\").*?(`|'|\")\s*)|UPDATE\s*(\(.+\)\s*|@{1,2}.+?\s*|\s+?.+?|(`|'|\").*?(`|'|\")\s*)SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE)@{0,2}(\\(.+\\)|\\s+?.+?\\s+?|(`|'|\").*?(`|'|\"))FROM(\\(.+\\)|\\s+?.+?|(`|'|\").*?(`|'|\"))|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)";
+function StopAttack($StrFiltKey,$StrFiltValue,$ArrFiltReq){  
+
+	$StrFiltValue=arr_foreach($StrFiltValue);
+	if (preg_match("/".$ArrFiltReq."/is",$StrFiltValue)==1){   
+			print "<title>&#x6B22;&#x8FCE;&#x60A8;&#x4F7F;&#x7528;&#x5929;&#x7F51;&#x7F51;&#x7AD9;&#x9632;&#x706B;&#x5899;</title><div style=\"margin: 0 auto; width:800px; padding-top:70px; overflow:hidden;\"><div style=\"width:800px; float:left;\"><div style=\" height:40px; line-height:40px; color:#fff; font-size:16px; overflow:hidden; background:#4169E1; padding-left:20px;\">&#x5929;&#x7F51;&#x7F51;&#x7AD9;&#x9632;&#x706B;&#x5899;&#x4E3A;&#x60A8;&#x7F51;&#x7AD9;&#x62A4;&#x822A; </div><div style=\"border:1px dashed #cdcece; border-top:none; font-size:14px; background:#fff; color:#555; line-height:24px; height:220px; padding:20px 20px 0 20px; overflow-y:auto;background:#f3f7f9;\"><p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#fc4f03;\">&#x60A8;&#x7684;&#x8BF7;&#x6C42;&#x5E26;&#x6709;&#x4E0D;&#x5408;&#x6CD5;&#x53C2;&#x6570;&#xFF0C;&#x5DF2;&#x88AB;&#x7F51;&#x7AD9;&#x7BA1;&#x7406;&#x5458;&#x8BBE;&#x7F6E;&#x62E6;&#x622A;&#xFF01;</span></p><p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">&#x53EF;&#x80FD;&#x539F;&#x56E0;&#xFF1A;&#x60A8;&#x63D0;&#x4EA4;&#x7684;&#x5185;&#x5BB9;&#x5305;&#x542B;&#x5371;&#x9669;&#x7684;&#x653B;&#x51FB;&#x8BF7;&#x6C42;</p><p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;\">&#x5982;&#x4F55;&#x89E3;&#x51B3;&#xFF1A;</p><ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">1&#x3001;&#x68C0;&#x67E5;&#x63D0;&#x4EA4;&#x5185;&#x5BB9;&#xFF1B;</li><li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">2&#x3001;&#x5982;&#x7F51;&#x7AD9;&#x6258;&#x7BA1;&#xFF0C;&#x8BF7;&#x8054;&#x7CFB;&#x7A7A;&#x95F4;&#x63D0;&#x4F9B;&#x5546;&#xFF1B;</li><li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">3&#x3001;&#x666E;&#x901A;&#x7F51;&#x7AD9;&#x8BBF;&#x5BA2;&#xFF0C;&#x8BF7;&#x8054;&#x7CFB;&#x7F51;&#x7AD9;&#x7BA1;&#x7406;&#x5458;&#xFF1B;</li></ul></div></div></div>";
+			exit();
+	}
+	if (preg_match("/".$ArrFiltReq."/is",$StrFiltKey)==1){   
+			print "<title>&#x6B22;&#x8FCE;&#x60A8;&#x4F7F;&#x7528;&#x5929;&#x7F51;&#x7F51;&#x7AD9;&#x9632;&#x706B;&#x5899;</title><div style=\"margin: 0 auto; width:800px; padding-top:70px; overflow:hidden;\"><div style=\"width:800px; float:left;\"><div style=\" height:40px; line-height:40px; color:#fff; font-size:16px; overflow:hidden; background:#4169E1; padding-left:20px;\">&#x5929;&#x7F51;&#x7F51;&#x7AD9;&#x9632;&#x706B;&#x5899;&#x4E3A;&#x60A8;&#x7F51;&#x7AD9;&#x62A4;&#x822A; </div><div style=\"border:1px dashed #cdcece; border-top:none; font-size:14px; background:#fff; color:#555; line-height:24px; height:220px; padding:20px 20px 0 20px; overflow-y:auto;background:#f3f7f9;\"><p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#fc4f03;\">&#x60A8;&#x7684;&#x8BF7;&#x6C42;&#x5E26;&#x6709;&#x4E0D;&#x5408;&#x6CD5;&#x53C2;&#x6570;&#xFF0C;&#x5DF2;&#x88AB;&#x7F51;&#x7AD9;&#x7BA1;&#x7406;&#x5458;&#x8BBE;&#x7F6E;&#x62E6;&#x622A;&#xFF01;</span></p><p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">&#x53EF;&#x80FD;&#x539F;&#x56E0;&#xFF1A;&#x60A8;&#x63D0;&#x4EA4;&#x7684;&#x5185;&#x5BB9;&#x5305;&#x542B;&#x5371;&#x9669;&#x7684;&#x653B;&#x51FB;&#x8BF7;&#x6C42;</p><p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;\">&#x5982;&#x4F55;&#x89E3;&#x51B3;&#xFF1A;</p><ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">1&#x3001;&#x68C0;&#x67E5;&#x63D0;&#x4EA4;&#x5185;&#x5BB9;&#xFF1B;</li><li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">2&#x3001;&#x5982;&#x7F51;&#x7AD9;&#x6258;&#x7BA1;&#xFF0C;&#x8BF7;&#x8054;&#x7CFB;&#x7A7A;&#x95F4;&#x63D0;&#x4F9B;&#x5546;&#xFF1B;</li><li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">3&#x3001;&#x666E;&#x901A;&#x7F51;&#x7AD9;&#x8BBF;&#x5BA2;&#xFF0C;&#x8BF7;&#x8054;&#x7CFB;&#x7F51;&#x7AD9;&#x7BA1;&#x7406;&#x5458;&#xFF1B;</li></ul></div></div></div>";
+			exit();
+	}  
+}  
+//$ArrPGC=array_merge($_GET,$_POST,$_COOKIE);
+foreach($_GET as $key=>$value){ 
+	StopAttack($key,$value,$getfilter);
+    if (!preg_match($pattern_url, $strurl)){
+    $arr1=array('<','>','"',"'",'$','*','=','{','}','!','%','&','(',')','[',']','?',';');
+    $arr2=array('﹤','﹥','＂',"＇",'﹩','﹡','﹦','﹛','﹜','！','﹪','﹠','（','）','［','］','？','﹔');
+    $_GET[$key]=str_replace($arr1,$arr2,$value);
+    }
+}
+foreach($_POST as $key=>$value){ 
+	StopAttack($key,$value,$postfilter);
+    if (!preg_match($pattern_url, $strurl)){
+    $arr1=array('<','>','"',"'",'$','*','=','{','}','!','%','&','(',')','[',']','?',';');
+    $arr2=array('﹤','﹥','＂',"＇",'﹩','﹡','﹦','﹛','﹜','！','﹪','﹠','（','）','［','］','？','﹔');
+    $_POST[$key]=str_replace($arr1,$arr2,$value);
+    }
+}
+foreach($_COOKIE as $key=>$value){ 
+	StopAttack($key,$value,$cookiefilter);
+}
+foreach($referer as $key=>$value){ 
+	StopAttack($key,$value,$refererfilter);
+}
+function arr_foreach($arr) {
+	static $str;
+	if (!is_array($arr)) {
+	return $arr;
+	}
+	foreach ($arr as $key => $val ) {
+
+	if (is_array($val)) {
+
+		arr_foreach($val);
+	} else {
+
+	  $str[] = $val;
+	}
+	}
+	return implode($str);
+}
+?>

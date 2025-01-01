@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="668px" height="664px" viewBox="0 0 668 664" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 61.1 (89650) - https://sketch.com -->
+    <title>Warehouses-04</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="145" width="240" height="48" rx="10"></rect>
+        <filter x="-2.9%" y="-10.4%" width="105.8%" height="129.2%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-3" x="0" y="233" width="240" height="48" rx="10"></rect>
+        <filter x="-2.9%" y="-10.4%" width="105.8%" height="129.2%" filterUnits="objectBoundingBox" id="filter-4">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-5" x="0" y="321" width="240" height="48" rx="10"></rect>
+        <filter x="-2.9%" y="-10.4%" width="105.8%" height="129.2%" filterUnits="objectBoundingBox" id="filter-6">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-7" x="420" y="145" width="240" height="48" rx="10"></rect>
+        <filter x="-2.9%" y="-10.4%" width="105.8%" height="129.2%" filterUnits="objectBoundingBox" id="filter-8">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-9" x="420" y="233" width="240" height="48" rx="10"></rect>
+        <filter x="-2.9%" y="-10.4%" width="105.8%" height="129.2%" filterUnits="objectBoundingBox" id="filter-10">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-11" x="420" y="321" width="240" height="48" rx="10"></rect>
+        <filter x="-2.9%" y="-10.4%" width="105.8%" height="129.2%" filterUnits="objectBoundingBox" id="filter-12">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="eng" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="07海外仓" transform="translate(-349.000000, -3291.000000)">
+            <g id="Warehouses-04" transform="translate(353.000000, 3291.000000)">
+                <path d="M330,472 C448.741221,472 545,375.741221 545,257 C545,138.258779 448.741221,42 330,42 C211.258779,42 115,138.258779 115,257 C115,375.741221 211.258779,472 330,472 Z" id="Oval" stroke="#505050" stroke-dasharray="2"></path>
+                <rect id="Rectangle" fill="#FFFFFF" x="263" y="457" width="135" height="21"></rect>
+                <g id="Rectangle">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                    <use fill="#F1F5F8" fill-rule="evenodd" xlink:href="#path-1"></use>
+                </g>
+                <g id="Rectangle-Copy-3">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                    <use fill="#F1F5F8" fill-rule="evenodd" xlink:href="#path-3"></use>
+                </g>
+                <g id="Rectangle-Copy-9">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-6)" xlink:href="#path-5"></use>
+                    <use fill="#F1F5F8" fill-rule="evenodd" xlink:href="#path-5"></use>
+                </g>
+                <g id="Rectangle-Copy">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-8)" xlink:href="#path-7"></use>
+                    <use fill="#F1F5F8" fill-rule="evenodd" xlink:href="#path-7"></use>
+                </g>
+                <rect id="Rectangle-Copy-2" fill="#27A44E" x="280" y="0" width="100" height="100" rx="20"></rect>
+                <rect id="Rectangle-Copy-11" fill="#FC9A13" x="280" y="414" width="100" height="100" rx="20"></rect>
+                <rect id="Rectangle-Copy-12" fill="#0F9ED6" x="280" y="564" width="100" height="100" rx="20"></rect>
+                <g id="Rectangle-Copy-8">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-10)" xlink:href="#path-9"></use>
+                    <use fill="#F1F5F8" fill-rule="evenodd" xlink:href="#path-9"></use>
+                </g>
+                <g id="Rectangle-Copy-10">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-12)" xlink:href="#path-11"></use>
+                    <use fill="#F1F5F8" fill-rule="evenodd" xlink:href="#path-11"></use>
+                </g>
+                <text id="Chinese-Sellers" font-family="Arial-BoldMT, Arial" font-size="15" font-weight="bold" fill="#FFFFFF">
+                    <tspan x="300.823975" y="48">Chinese </tspan>
+                    <tspan x="305.397949" y="65">Sellers</tspan>
+                </text>
+                <text id="Stock-Up-According-t" font-family="ArialMT, Arial" font-size="16" font-weight="normal" fill="#020604">
+                    <tspan x="50.1875" y="168">Stock Up According </tspan>
+                    <tspan x="54.1953125" y="185">to Market Demand</tspan>
+                </text>
+                <text id="Online-Sales" font-family="ArialMT, Arial" font-size="16" font-weight="normal" fill="#111111">
+                    <tspan x="494.640625" y="175">Online Sales</tspan>
+                </text>
+                <text id="Consignment-to-XBNia" font-family="ArialMT, Arial" font-size="16" font-weight="normal" fill="#020604">
+                    <tspan x="34.6210938" y="263">Consignment to XBNiao</tspan>
+                </text>
+                <text id="Overseas-Buyers-Purc" font-family="ArialMT, Arial" font-size="16" font-weight="normal" fill="#111111">
+                    <tspan x="442.625" y="263">Overseas Buyers Purchase</tspan>
+                </text>
+                <text id="Shipment-to-XBNiao's" font-family="ArialMT, Arial" font-size="16" font-weight="normal" fill="#020604">
+                    <tspan x="42.4335938" y="344">Shipment to XBNiao's </tspan>
+                    <tspan x="38.9296875" y="361">Overseas Warehouses</tspan>
+                </text>
+                <text id="Dispatch-Instruction" font-family="ArialMT, Arial" font-size="16" font-weight="normal" fill="#111111">
+                    <tspan x="469.746094" y="351">Dispatch Instruction</tspan>
+                </text>
+                <text id="Local-Distribution-b" font-family="Arial-BoldMT, Arial" font-size="15" font-weight="bold" line-spacing="17" fill="#FFFFFF">
+                    <tspan x="310.411377" y="443">Local </tspan>
+                    <tspan x="287.922363" y="460">Distribution </tspan>
+                    <tspan x="285.384521" y="477">by Overseas </tspan>
+                    <tspan x="285.681152" y="494">Warehouses</tspan>
+                </text>
+                <text id="Overseas-Buyers" font-family="Arial-BoldMT, Arial" font-size="15" font-weight="bold" fill="#FFFFFF">
+                    <tspan x="296.220703" y="612">Overseas </tspan>
+                    <tspan x="304.570312" y="629">Buyers</tspan>
+                </text>
+                <line x1="330" y1="514" x2="330" y2="555" id="Path-5" stroke="#979797" stroke-dasharray="2"></line>
+                <polygon id="三角形-copy-2" fill="#505050" transform="translate(330.000000, 551.000000) scale(1, -1) translate(-330.000000, -551.000000) " points="330 543 338 559 322 559"></polygon>
+                <polygon id="三角形-copy-3" fill="#505050" transform="translate(397.000000, 461.000000) scale(1, -1) rotate(-71.000000) translate(-397.000000, -461.000000) " points="397 453 405 469 389 469"></polygon>
+                <polygon id="三角形-copy-4" fill="#505050" transform="translate(263.000000, 461.000000) scale(-1, -1) rotate(-71.000000) translate(-263.000000, -461.000000) " points="263 453 271 469 255 469"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

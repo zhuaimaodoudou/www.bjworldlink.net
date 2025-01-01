@@ -1,0 +1,37 @@
+<aside>
+    <div class="search">
+      <form action="{pboot:scaction}"  method="get" >
+        <input name="keyword" class="input_text" value="" placeholder="请输入关键词如：框架"
+          style="color: rgb(153, 153, 153);"  type="text">
+        <input  value="title" type="hidden">
+        <input  value="1" type="hidden">
+        <input  value="news" type="hidden">
+        <input class="input_submit" value="搜索" type="submit">
+      </form>
+    </div>
+    <div class="tagsclous">
+      <h2 class="aside_title">标签云</h2>
+      <ul>
+        {pboot:list scode=7}
+        <a href="/?keyword=[list:title]">
+          <p>[list:title]</p>
+        </a>
+        {/pboot:list}
+      
+      </ul>
+    </div>
+    <div class="tuijian">
+      <h2 class="aside_title">点击排行</h2>
+      <ul>
+        {pboot:list scode=1 num=10 order='visits'}
+        <li><a href="[list:link]" target="_blank"><i><img src="[list:ico]"
+          alt="[list:title]"></i>
+      <p>[list:title]</p>
+    </a></li>
+        {/pboot:list}
+       
+     
+      </ul>
+    </div>
+
+  </aside>

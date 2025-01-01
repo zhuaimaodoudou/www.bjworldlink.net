@@ -1,0 +1,1200 @@
+{include file='common/head.html'}
+{include file='common/ueditor.html'}
+<style>
+    .el-textarea,
+    .el-textarea textarea {
+        min-height: 100px !important;
+    }
+</style>
+{if([$list])}
+<script type="text/javascript" src="{APP_THEME_DIR}/js/jquery.cookie.min.js"></script>
+{/if}
+<div class="layui-body" id="app-vue">
+    {if([$list])}
+    <div class="layui-tab layui-tab-brief" lay-filter="tab">
+        <ul class="layui-tab-title">
+            <li class="layui-this" lay-id="t1">栏目列表</li>
+            <li lay-id="t2">栏目新增</li>
+            <li lay-id="t3">批量新增</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <form action="{url./admin/ContentSort/mod}" method="post" id="sortForm" name="sortForm"
+                    onkeydown="if(event.keyCode==13) return false;" class="layui-form">
+                    <input type="hidden" name="formcheck" value="{$formcheck}">
+                    <table class="layui-table" id="sortTable">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" lay-ignore id="checkall" title="全选"></th>
+                                <th>栏目名称</th>
+                                <th>编码</th>
+                                <th>URL名称</th>
+                                <th>模型</th>
+                                <th>列表页模板</th>
+                                <th>详情页模板</th>
+                                <th>排序</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <div>展开全部菜单 <i class='fa fa-toggle-off' id="openMenu" title="点击关闭"></i></div>
+                            {foreach $sorts(key,value)}
+                            <tr data-tt-id='[value->scode]' data-tt-parent-id="[value->pcode]">
+                                <td>
+                                    <input type="checkbox" class="checkitem" lay-ignore name="list[]"
+                                        value="[value->scode]">
+                                    <input type="hidden" name="listall[]" value="[value->id]">
+                                </td>
+                                <td class="layui-table-cell table-title ">
+                                    {if($value->son)}
+                                    <i class="fa fa-folder-o" aria-hidden="true"></i>
+                                    {else}
+                                    <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+                                    {/if}
+                                    <input type="text" name="name[]" value="[value->name]" class="layui-input"
+                                        style="width:auto">
+                                    {if($value->outlink)}
+                                    <a href="[value->outlink]" target="_blank"><i class="fa fa-external-link"
+                                            aria-hidden="true"></i></a>
+                                    {/if}
+                                </td>
+                                <td>[value->scode]</td>
+                                <td>[value->filename]</td>
+                                <td>
+                                    {foreach $allmodels(key2,value2)}
+                                    {if($value2->mcode==$value->mcode)}
+                                    [value2->name]
+                                    {/if}
+                                    {/foreach}
+                                </td>
+                                <td>[value->listtpl]</td>
+                                <td>[value->contenttpl]</td>
+                                <td class="table-input"><input type="text" name="sorting[]" value="[value->sorting]"
+                                        class="layui-input"></td>
+                                <td>
+                                    {if($value->status)}
+                                    <a href="{url./admin/'.C.'/mod/scode/'.$value->scode.'/field/status/value/0}"
+                                        class="switch"><i class='fa fa-toggle-on' title="点击禁用"></i></a>
+                                    {else}
+                                    <a href="{url./admin/'.C.'/mod/scode/'.$value->scode.'/field/status/value/1}"
+                                        class="switch"><i class='fa fa-toggle-off' title="点击启用"></i></a>
+                                    {/if}
+                                </td>
+                                <td>
+                                    {if(!$value->outlink)}
+                                    {php}
+                                    $Parser=new app\home\controller\ParserController();
+                                    $link=$Parser->parserLink($value->type,$value->urlname,'list',$value->scode,$value->filename,'','');
+                                    {/php}
+                                    <a href="{php}echo $link{/php}" class="layui-btn layui-btn-xs layui-btn-primary"
+                                        target="_blank">查看</a>
+                                    {/if}
+                                    {fun=get_btn_del($value->scode,'scode')}
+                                    {fun=get_btn_mod($value->scode,'scode')}
+
+                                    {if(!$value->outlink)}
+                                    {if($value->type==1)}
+                                    {php}
+                                    $value->urlContent='?p=Single/index/mcode/'.$value->mcode.'&field=b.name&keyword='.$value->name
+                                    {/php}
+                                    {else}
+                                    {php}
+                                    $value->urlContent='?p=Content/index/mcode/'.$value->mcode.'&scode='.$value->scode
+                                    {/php}
+                                    {/if}
+                                    <a href="[value->urlContent]" class="layui-btn layui-btn-xs layui-btn-warm">查看内容</a>
+                                    {/if}
+
+                                </td>
+                            </tr>
+                            {/foreach}
+                        </tbody>
+                    </table>
+                    <div class="layui-input-inline">
+                        <select name="pcode">
+                            <option value="">请选择移动到栏目</option>
+                            <option value="0">顶级栏目</option>
+                            {$sort_select}
+                        </select>
+                    </div>
+                    <script>
+                        function setDelAction() {
+                            document.sortForm.action = "{url./admin/ContentSort/del}";
+                            return confirm("您确定要删除选中的栏目么？");
+                        }
+                    </script>
+                    <button type="submit" name="submit" value="move" class="layui-btn">移动栏目</button>
+                    <button type="submit" name="submit" value="copy" class="layui-btn">复制栏目</button>
+                    <button type="submit" name="submit" value="name" class="layui-btn">保存标题</button>
+                    <button type="submit" name="submit" value="sorting" class="layui-btn">保存排序</button>
+                    <button type="submit" name="submit" onclick="return setDelAction();" class="layui-btn">批量删除</button>
+
+                    {if(![$one_area])}
+                    <div class="layui-input-inline layui-col-md-offset3">
+                        <select name="acode">
+                            <option value="">复制到其他语言</option>
+                            {$area_htmlS}
+                        </select>
+                    </div>
+                    <button type="submit" name="submit" value="copyall" class="layui-btn">复制到其他语言</button>
+                    {/if}
+
+
+                </form>
+            </div>
+            <div class="layui-tab-item">
+                <form action="{url./admin/ContentSort/add}" method="post" class="layui-form" lay-filter="sort">
+                    <input type="hidden" name="formcheck" value="{$formcheck}">
+                    <div class="layui-tab">
+                        <ul class="layui-tab-title">
+                            <li class="layui-this">基本选项</li>
+                            <li>高级选项</li>
+                        </ul>
+                        <div class="layui-tab-content">
+                            <div class="layui-tab-item layui-show">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">父栏目</label>
+                                    <div class="layui-input-block">
+                                        <select name="pcode">
+                                            <option value="0">顶级栏目</option>
+                                            {$sort_select}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">栏目名称 <span class="layui-text-red">*</span></label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="name" required lay-verify="required"
+                                            placeholder="请输入栏目名称" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">URL名称</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="filename" placeholder="请输入URL名称，如:test，test/a/b/c"
+                                            class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">内容模型 <span class="layui-text-red">*</span></label>
+                                    <div class="layui-input-block">
+                                        <select name="mcode" lay-filter="model" lay-verify="required">
+                                            <option value="">请选择内容模型</option>
+                                            {foreach $models(key,value)}
+                                            <option value="[value->mcode]" data-type="[value->type]"
+                                                data-listtpl="[value->listtpl]" data-contenttpl="[value->contenttpl]">[value->name]</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+                                <input type="hidden" value="1" name="type" id="type">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">列表页模板</label>
+                                    <div class="layui-input-block">
+                                        <select name="listtpl" id="listtpl">
+                                            <option value="">无</option>
+                                            {foreach $tpls(key,value)}
+                                            <option value="[value]">[value]</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">详情页模板</label>
+                                    <div class="layui-input-block">
+                                        <select name="contenttpl" id="contenttpl">
+                                            <option value="">无</option>
+                                            {foreach $tpls(key,value)}
+                                            <option value="[value]">[value]</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">状态</label>
+                                    <div class="layui-input-block">
+                                        <input type="radio" name="status" value="1" title="显示" checked>
+                                        <input type="radio" name="status" value="0" title="隐藏">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">浏览权限</label>
+                                    <div class="layui-input-block">
+                                        <select name="gid">
+                                            <option value="">不限制</option>
+                                            {foreach $groups(key,value)}
+                                            <option value="[value->id]">[value->gname]</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">权限类型</label>
+                                    <div class="layui-input-block">
+                                        <select name="gtype" id="gtype">
+                                            <option value="1">小于</option>
+                                            <option value="2">小于等于</option>
+                                            <option value="3">等于</option>
+                                            <option value="4" selected>大于等于</option>
+                                            <option value="5">大于</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-tab-item">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">栏目副名称</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="subname" placeholder="请输入栏目副名称" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">跳转链接</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="outlink" placeholder="请输入跳转链接" class="layui-input">
+                                    </div>
+                                </div>
+                       
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">栏目缩略图</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="ico" id="ico" placeholder="请上传栏目缩略图"
+                                            class="layui-input">
+                                    </div>
+                                    <button type="button" class="layui-btn upload" data-des="ico">
+                                        <i class="layui-icon">&#xe67c;</i>上传图片
+                                    </button>
+                                    <a class="layui-btn layui-btn-warm" onclick="GetPictureFolder(1,'ico');">图库</a>
+                                    <div id="ico_box" class="pic"></div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">栏目大图</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="pic" id="pic" placeholder="请上传栏目大图"
+                                            class="layui-input">
+                                    </div>
+                                    <button type="button" class="layui-btn upload" data-des="pic">
+                                        <i class="layui-icon">&#xe67c;</i>上传图片
+                                    </button>
+                                    <a class="layui-btn layui-btn-warm" onclick="GetPictureFolder(1,'pic');">图库</a>
+                                    <div id="pic_box" class="pic"></div>
+                                </div>
+                                <div style="padding: 15px 0">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">栏目扩展1</label>
+                                        <div v-if="def1_type === 'textarea'" class="layui-input-block">
+                                            <el-input type="textarea" autosize placeholder="请输入栏目扩展1内容" v-model="def1"
+                                                maxlength="1000" show-word-limit>
+                                        </div>
+                                        <div v-if="def1_type === 'img'" class="layui-input-block">
+                                            <el-upload name="upload" class="upload-demo"
+                                                action="{url./admin/index/upload}" :file-list="def1Imgs"
+                                                :on-remove="def1HandleRemove" :on-success="def1HandleSuccess"
+                                                list-type="picture">
+                                                <el-button type="primary">上传图片</el-button>
+                                                <div slot="tip" class="el-upload__tip">上传文件大小不建议超过500k</div>
+                                            </el-upload>
+
+                                        </div>
+                                        <div v-if="def1_type === 'file'" class="layui-input-block">
+                                            <el-upload name="upload" class="upload-demo"
+                                                action="{url./admin/index/upload}" :file-list="def1Files"
+                                                :on-remove="def1HandleRemove" :on-success="def1HandleSuccess"
+                                                list-type="text">
+                                                <el-button type="primary">上传附件</el-button>
+                                            </el-upload>
+
+                                        </div>
+
+                                        <div v-show="def1_type === 'editor'" class="layui-input-block">
+                                            <p>使用编辑器，请多等待一下，如果上传后无内容，请重新编辑，重新编辑是有内容的</p>
+                                            <textarea type="text/plain" name="def1" ref="def1" v-model="def1"
+                                                id="editor_1" style="width:100%;height:360px;"> </textarea>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">扩展1的类型</label>
+                                        <input type="hidden" name="def1_type" v-model="def1_type">
+                                        <el-select v-model="def1_type" placeholder="请选择栏目扩展1的类型">
+                                            <el-option v-for="item in defOptions" :key="item.value" :label="item.label"
+                                                :value="item.value">
+                                            </el-option>
+                                        </el-select>
+                                    </div>
+                                </div>
+
+                                <div style="padding: 15px 0">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">栏目扩展2</label>
+
+                                        <div v-if="def2_type === 'textarea'" class="layui-input-block">
+                                            <el-input type="textarea" autosize placeholder="请输入栏目扩展2内容" v-model="def2"
+                                                maxlength="1000" show-word-limit>
+                                        </div>
+                                        <div v-if="def2_type === 'img'" class="layui-input-block">
+                                            <el-upload name="upload" class="upload-demo" :on-remove="def2HandleRemove"
+                                                action="{url./admin/index/upload}" :file-list="def2Imgs"
+                                                :on-success="def2HandleSuccess" list-type="picture">
+                                                <el-button type="primary">上传图片</el-button>
+                                                <div slot="tip" class="el-upload__tip">上传文件大小不建议超过500k</div>
+                                            </el-upload>
+
+                                        </div>
+                                        <div v-if="def2_type === 'file'" class="layui-input-block">
+                                            <el-upload name="upload" class="upload-demo"
+                                                action="{url./admin/index/upload}" :file-list="def2Files"
+                                                :on-remove="def2HandleRemove" :on-success="def2HandleSuccess"
+                                                list-type="text">
+                                                <el-button type="primary">上传附件</el-button>
+                                            </el-upload>
+
+                                        </div>
+
+                                        <div v-show="def2_type === 'editor'" class="layui-input-block">
+                                            <p>使用编辑器，请多等待一下，如果上传后无内容，请重新编辑，重新编辑是有内容的</p>
+                                            <textarea type="text/plain" name="def2" ref="def2" v-model="def2"
+                                                id="editor_2" style="width:100%;height:360px;"> </textarea>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">扩展2的类型</label>
+                                        <input type="hidden" name="def2_type" v-model="def2_type">
+                                        <el-select v-model="def2_type" placeholder="请选择栏目扩展2的类型">
+                                            <el-option v-for="item in defOptions" :key="item.value" :label="item.label"
+                                                :value="item.value">
+                                            </el-option>
+                                        </el-select>
+                                    </div>
+                                </div>
+
+                                <div style="padding: 15px 0">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">栏目扩展3</label>
+                                        <div v-if="def3_type === 'textarea'" class="layui-input-block">
+                                            <el-input type="textarea" autosize placeholder="请输入栏目扩展3内容" v-model="def3"
+                                                maxlength="1000" show-word-limit>
+                                        </div>
+                                        <div v-if="def3_type === 'img'" class="layui-input-block">
+                                            <el-upload name="upload" class="upload-demo"
+                                                action="{url./admin/index/upload}" :file-list="def3Imgs"
+                                                :on-remove="def3HandleRemove" :on-success="def3HandleSuccess"
+                                                list-type="picture">
+                                                <el-button type="primary">上传图片</el-button>
+                                                <div slot="tip" class="el-upload__tip">上传文件大小不建议超过500k</div>
+                                            </el-upload>
+
+                                        </div>
+                                        <div v-if="def3_type === 'file'" class="layui-input-block">
+                                            <el-upload name="upload" class="upload-demo"
+                                                action="{url./admin/index/upload}" :file-list="def3Files"
+                                                :on-remove="def3HandleRemove" :on-success="def3HandleSuccess"
+                                                list-type="text">
+                                                <el-button type="primary">上传附件</el-button>
+                                            </el-upload>
+
+                                        </div>
+                                        <div v-show="def3_type === 'editor'" class="layui-input-block">
+                                            <p>这个可以正常编辑，不需要等待</p>
+                                            <textarea type="text/plain" name="def3" ref="def3" v-model="def3"
+                                                id="editor_3" style="width:100%;height:360px;"> </textarea>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">扩展3的类型</label>
+                                        <input type="hidden" name="def3_type" v-model="def3_type">
+                                        <el-select v-model="def3_type" placeholder="请选择栏目扩展3的类型">
+                                            <el-option v-for="item in defOptions" :key="item.value" :label="item.label"
+                                                :value="item.value">
+                                            </el-option>
+                                        </el-select>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">权限不足提示</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="gnote" placeholder="请输入权限不足时提示文本" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">SEO标题</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="title" placeholder="请输入栏目SEO标题，需前端调用"
+                                            class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">SEO关键字</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="keywords" placeholder="请输入栏目SEO关键字，需前端调用"
+                                            class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">SEO描述</label>
+                                    <div class="layui-input-block">
+                                        <textarea name="description" placeholder="请输入栏目SEO描述，需前端调用"
+                                            class="layui-textarea"></textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit>立即提交</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- 批量新增 -->
+            <div class="layui-tab-item">
+                <form action="{url./admin/ContentSort/add}" method="post" class="layui-form" lay-filter="sort">
+                    <input type="hidden" name="formcheck" value="{$formcheck}">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">父栏目</label>
+                        <div class="layui-input-block">
+                            <select name="pcode">
+                                <option value="0">顶级栏目</option>
+                                {$sort_select}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">栏目名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="multiplename" required lay-verify="required"
+                                placeholder="请输入栏目名称，多个栏目用逗号隔开" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">内容模型</label>
+                        <div class="layui-input-block">
+                            <select name="mcode" lay-filter="model" lay-verify="required">
+                                <option value="">请选择内容模型</option>
+                                {foreach $models(key,value)}
+                                <option value="[value->mcode]" data-type="[value->type]" data-listtpl="[value->listtpl]"
+                                    data-contenttpl="[value->contenttpl]">[value->name]</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <input type="hidden" value="1" name="type" id="type">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">列表页模板</label>
+                        <div class="layui-input-block">
+                            <select name="listtpl" id="listtpl">
+                                <option value="">无</option>
+                                {foreach $tpls(key,value)}
+                                <option value="[value]">[value]</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">详情页模板</label>
+                        <div class="layui-input-block">
+                            <select name="contenttpl" id="contenttpl">
+                                <option value="">无</option>
+                                {foreach $tpls(key,value)}
+                                <option value="[value]">[value]</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <input type="radio" name="status" value="1" title="显示" checked>
+                            <input type="radio" name="status" value="0" title="隐藏">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit>立即提交</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {/if}
+    {if([$mod])}
+    <div class="layui-tab layui-tab-brief" lay-filter="tab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">栏目修改</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <form action="{url./admin/ContentSort/mod/scode/'.[$get.scode].'}{$backurl}" method="post"
+                    class="layui-form" lay-filter="sort">
+                    <input type="hidden" name="formcheck" value="{$formcheck}">
+                    <div class="layui-tab">
+                        <ul class="layui-tab-title">
+                            <li class="layui-this">基本选项</li>
+                            <li>高级选项</li>
+                        </ul>
+                        <div class="layui-tab-content">
+                            <div class="layui-tab-item layui-show">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">父栏目</label>
+                                    <div class="layui-input-block">
+                                        <select name="pcode" id="pcode">
+                                            <option value="0">顶级栏目</option>
+                                            {$sort_select}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">栏目名称 <span class="layui-text-red">*</span></label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="name" required lay-verify="required"
+                                            value="{$sort->name}" placeholder="请输入栏目名称" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">URL名称 </label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="filename" value="{$sort->filename}"
+                                            placeholder="请输入URL名称，如:test，test/a/b/c" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">内容模型 <span class="layui-text-red">*</span></label>
+                                    <div class="layui-input-block">
+                                        <select name="mcode" lay-filter="model" lay-verify="required">
+                                            <option value="">请选择内容模型</option>
+                                            {foreach $models(key,value)}
+                                            <option value="[value->mcode]" {if($value->mcode==[$sort->mcode])}selected{/if} data-type="[value->type]" data-listtpl="[value->listtpl]" data-contenttpl="[value->contenttpl]">[value->name]</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="type" id="type" value="{$sort->type}">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">列表页模板</label>
+                                    <div class="layui-input-block">
+                                        <select name="listtpl" id="listtpl">
+                                            <option value="{$sort->listtpl}">{$sort->listtpl}</option>
+                                            <option value="">无</option>
+                                            {foreach $tpls(key,value)}
+                                            {if($value!=[$sort->listtpl])}
+                                            <option value="[value]">[value]</option>
+                                            {/if}
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">详情页模板</label>
+                                    <div class="layui-input-block">
+                                        <select name="contenttpl" id="contenttpl">
+                                            <option value="{$sort->contenttpl}">{$sort->contenttpl}</option>
+                                            <option value="">无</option>
+                                            {foreach $tpls(key,value)}
+                                            {if($value!=[$sort->contenttpl])}
+                                            <option value="[value]">[value]</option>
+                                            {/if}
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">同步子栏目模板</label>
+                                    <div class="layui-input-block">
+                                        <input type="radio" name="modsub" value="1" title="是">
+                                        <input type="radio" name="modsub" value="0" title="否" checked>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">状态</label>
+                                    <div class="layui-input-block">
+                                        <input type="radio" name="status" value="1" title="显示"
+                                            {if([$sort->status]==1)}checked="checked"{/if}>
+                                        <input type="radio" name="status" value="0" title="隐藏"
+                                            {if([$sort->status]==0)}checked="checked"{/if}>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">浏览权限</label>
+                                    <div class="layui-input-block">
+                                        <select name="gid">
+                                            <option value="">不限制</option>
+                                            {foreach $groups(key,value)}
+                                            <option value="[value->id]" {if([$sort->
+                                                gid]==$value->id)}selected="selected"{/if}>[value->gname]</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">权限类型</label>
+                                    <div class="layui-input-block">
+                                        <select name="gtype" id="gtype">
+                                            <option value="1" {if([$sort->gtype]==1)}selected="selected"{/if}>小于
+                                            </option>
+                                            <option value="2" {if([$sort->gtype]==2)}selected="selected"{/if}>小于等于
+                                            </option>
+                                            <option value="3" {if([$sort->gtype]==3)}selected="selected"{/if}>等于
+                                            </option>
+                                            <option value="4" {if([$sort->
+                                                gtype]==4||(![$sort->gtype]))}selected="selected"{/if}>大于等于</option>
+                                            <option value="5" {if([$sort->gtype]==5)}selected="selected"{/if}>大于
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-tab-item">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">栏目副名称</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="subname" value="{$sort->subname}"
+                                            placeholder="请输入栏目副名称" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">跳转链接</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="outlink" value="{$sort->outlink}" placeholder="请输入跳转链接"
+                                            class="layui-input">
+                                    </div>
+                                </div>
+                                
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">栏目缩略图</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="ico" id="ico" value="{$sort->ico}"
+                                            placeholder="请上传栏目缩略图" class="layui-input">
+                                    </div>
+                                    <button type="button" class="layui-btn upload" data-des="ico">
+                                        <i class="layui-icon">&#xe67c;</i>上传图片
+                                    </button>
+                                    <a class="layui-btn layui-btn-warm" onclick="GetPictureFolder(1,'ico');">图库</a>
+                                    <div id="ico_box" class="pic">
+                                        <dl>
+                                            <dt>{if([$sort->ico])}<img src='{SITE_DIR}{$sort->ico}'
+                                                    data-url="{$sort->ico}"></dt>
+                                            <dd>删除</dd>
+                                        </dl>{/if}
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">栏目大图</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="pic" id="pic" value="{$sort->pic}"
+                                            placeholder="请上传栏目大图" class="layui-input">
+                                    </div>
+                                    <button type="button" class="layui-btn upload" data-des="pic">
+                                        <i class="layui-icon">&#xe67c;</i>上传图片
+                                    </button>
+                                    <a class="layui-btn layui-btn-warm" onclick="GetPictureFolder(1,'pic');">图库</a>
+                                    <div id="pic_box" class="pic">
+                                        <dl>
+                                            <dt>{if([$sort->pic])}<img src='{SITE_DIR}{$sort->pic}'
+                                                    data-url="{$sort->pic}"></dt>
+                                            <dd>删除</dd>
+                                        </dl>{/if}
+                                    </div>
+                                </div>
+                                <div style="padding: 15px 0;">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">栏目扩展1</label>
+                                        <div v-if="def1_type === 'textarea'" class="layui-input-block">
+                                            <el-input type="textarea" autosize placeholder="请输入栏目扩展1内容" v-model="def1"
+                                                maxlength="1000" show-word-limit>
+                                        </div>
+                                        <div v-if="def1_type === 'img'" class="layui-input-block">
+                                            <el-upload name="upload" class="upload-demo"
+                                                action="{url./admin/index/upload}" :file-list="def1Imgs"
+                                                :on-remove="def1HandleRemove" :on-success="def1HandleSuccess"
+                                                list-type="picture">
+                                                <el-button type="primary">上传图片</el-button>
+                                                <div slot="tip" class="el-upload__tip">上传文件大小不建议超过500k</div>
+                                            </el-upload>
+
+                                        </div>
+                                        <div v-if="def1_type === 'file'" class="layui-input-block">
+                                            <el-upload name="upload" class="upload-demo" :on-remove="def1HandleRemove"
+                                                action="{url./admin/index/upload}" :file-list="def1Files"
+                                                :on-success="def1HandleSuccess" list-type="text">
+                                                <el-button type="primary">上传附件</el-button>
+                                            </el-upload>
+
+                                        </div>
+
+                                        <div v-show="def1_type === 'editor'" class="layui-input-block">
+                                            <textarea type="text/plain" name="def1" ref="def1" id="editor_1"
+                                                style="width:100%;height:360px;">{fun=decode_string([$sort->def1])}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">扩展1的类型</label>
+                                        <input type="hidden" name="def1_type" v-model="def1_type">
+                                        <el-select v-model="def1_type" placeholder="请选择栏目扩展1的类型">
+                                            <el-option v-for="item in defOptions" :key="item.value" :label="item.label"
+                                                :value="item.value">
+                                            </el-option>
+                                        </el-select>
+                                    </div>
+                                </div>
+                                <div style="padding: 15px 0;">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">栏目扩展2</label>
+                                        <div v-if="def2_type === 'textarea'" class="layui-input-block">
+                                            <el-input type="textarea" autosize placeholder="请输入栏目扩展2内容" v-model="def2"
+                                                maxlength="1000" show-word-limit>
+                                        </div>
+                                        <div v-if="def2_type === 'img'" class="layui-input-block">
+                                            <el-upload name="upload" class="upload-demo" :on-remove="def2HandleRemove"
+                                                action="{url./admin/index/upload}" :file-list="def2Imgs"
+                                                :on-success="def2HandleSuccess" list-type="picture">
+                                                <el-button type="primary">上传图片</el-button>
+                                                <div slot="tip" class="el-upload__tip">上传文件大小不建议超过500k</div>
+                                            </el-upload>
+
+                                        </div>
+                                        <div v-if="def2_type === 'file'" class="layui-input-block">
+                                            <el-upload name="upload" class="upload-demo" :on-remove="def2HandleRemove"
+                                                action="{url./admin/index/upload}" :file-list="def2Files"
+                                                :on-success="def2HandleSuccess" list-type="text">
+                                                <el-button type="primary">上传附件</el-button>
+                                            </el-upload>
+
+                                        </div>
+
+                                        <div v-show="def2_type === 'editor'" class="layui-input-block">
+                                            <textarea type="text/plain" name="def2" ref="def2" id="editor_2"
+                                                style="width:100%;height:360px;">{fun=decode_string([$sort->def2])}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">扩展2的类型</label>
+                                        <input type="hidden" name="def2_type" v-model="def2_type">
+                                        <el-select v-model="def2_type" placeholder="请选择栏目扩展2的类型">
+                                            <el-option v-for="item in defOptions" :key="item.value" :label="item.label"
+                                                :value="item.value">
+                                            </el-option>
+                                        </el-select>
+                                    </div>
+                                </div>
+                                <div style="padding: 15px 0;">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">栏目扩展3</label>
+                                        <div v-if="def3_type === 'textarea'" class="layui-input-block">
+                                            <el-input type="textarea" autosize placeholder="请输入栏目扩展3内容" v-model="def3"
+                                                maxlength="1000" show-word-limit>
+                                        </div>
+                                        <div v-if="def3_type === 'img'" class="layui-input-block">
+                                            <el-upload name="upload" class="upload-demo" :on-remove="def3HandleRemove"
+                                                action="{url./admin/index/upload}" :file-list="def3Imgs"
+                                                :on-success="def3HandleSuccess" list-type="picture">
+                                                <el-button type="primary">上传图片</el-button>
+                                                <div slot="tip" class="el-upload__tip">上传文件大小不建议超过500k</div>
+                                            </el-upload>
+
+                                        </div>
+                                        <div v-if="def3_type === 'file'" class="layui-input-block">
+                                            <el-upload name="upload" class="upload-demo" :on-remove="def3HandleRemove"
+                                                action="{url./admin/index/upload}" :file-list="def3Files"
+                                                :on-success="def3HandleSuccess" list-type="text">
+                                                <el-button type="primary">上传附件</el-button>
+                                            </el-upload>
+
+                                        </div>
+                                        <div v-show="def3_type === 'editor'" class="layui-input-block">
+                                            <textarea type="text/plain" name="def3" ref="def3" id="editor_3"
+                                                style="width:100%;height:360px;">{fun=decode_string([$sort->def3])}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">扩展3的类型</label>
+                                        <input type="hidden" name="def3_type" v-model="def3_type">
+                                        <el-select v-model="def3_type" placeholder="请选择栏目扩展3的类型">
+                                            <el-option v-for="item in defOptions" :key="item.value" :label="item.label"
+                                                :value="item.value">
+                                            </el-option>
+                                        </el-select>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">权限不足提示</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="gnote" value="{$sort->gnote}"
+                                            placeholder="请输入权限不足时提示文本" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">SEO标题</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="title" value="{$sort->title}"
+                                            placeholder="请输入栏目SEO标题，需前端调用" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">SEO关键字</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="keywords" value="{$sort->keywords}"
+                                            placeholder="请输入栏目SEO关键字，需前端调用" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">SEO描述</label>
+                                    <div class="layui-input-block">
+                                        <textarea name="description" placeholder="请输入栏目SEO描述，需前端调用"
+                                            class="layui-textarea">{$sort->description}</textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit>立即提交</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                            {fun=get_btn_back()}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {/if}
+</div>
+<script>
+    function originPbootFunc() {
+
+        //菜单全部展开
+        var iscookie = $.cookie('openMenu');
+        if (!iscookie) {
+            $("#sortTable").treetable({ expandable: true, column: 1, indent: 20, stringCollapse: '收缩', stringExpand: '展开' });
+            $('#openMenu.fa-toggle-on').removeClass('fa-toggle-on').addClass('fa-toggle-off');
+
+        } else {
+            $("#sortTable").treetable({ expandable: true, column: 1, indent: 20, stringCollapse: '收缩', stringExpand: '展开', initialState: "expanded" });
+            console.log('展开');
+
+            $('#openMenu.fa-toggle-off').removeClass('fa-toggle-off').addClass('fa-toggle-on');
+        }
+
+        $("#openMenu").click(function () {
+            var iscookie = $.cookie('openMenu');
+
+            if (iscookie) {
+                $.removeCookie('openMenu');
+            } else {
+                $.cookie('openMenu', 'true');
+            }
+            location.reload();
+        })
+    }
+    const def1Vue = new Vue({
+        el: "#app-vue",
+        data() {
+            return {
+                isList: "{if([$list])}1{/if}",
+                def1_type: '{$sort->def1_type}' || "textarea",
+                def1: `{$sort->def1}`,
+                def2_type: '{$sort->def2_type}' || "textarea",
+                def2: `{$sort->def2}`,
+                def3_type: '{$sort->def3_type}' || "textarea",
+                def3: `{$sort->def3}`,
+                editor1: null,
+                editor2: null,
+                editor3: null,
+                def1Imgs: [],
+                def2Imgs: [],
+                def3Imgs: [],
+                def1Files: [],
+                def2Files: [],
+                def3Files: [],
+                defOptions: [
+                    {
+                        value: 'textarea',
+                        label: '文本类型',
+                    },
+                    {
+                        value: 'img',
+                        label: '图片类型',
+                    },
+                    {
+                        value: 'file',
+                        label: '附件类型',
+                    },
+                    {
+                        value: 'editor',
+                        label: '编辑器'
+                    }
+                ]
+            }
+        },
+        created() {
+            if (this.def1 && this.def1_type === "img") {
+                const def1Imgs = this.def1.split(",")
+                for (const item of def1Imgs) {
+                    this.def1Imgs.push({
+                        name: item,
+                        url: item
+                    })
+                }
+            }
+            if (this.def2 && this.def2_type === "img") {
+                const def2Imgs = this.def2.split(",")
+                for (const item of def2Imgs) {
+                    this.def2Imgs.push({
+                        name: item,
+                        url: item
+                    })
+                }
+            }
+            if (this.def3 && this.def3_type === "img") {
+                const def3Imgs = this.def3.split(",")
+                for (const item of def3Imgs) {
+                    this.def3Imgs.push({
+                        name: item,
+                        url: item
+                    })
+                }
+            }
+            if (this.def1 && this.def1_type === "file") {
+                const def1Files = this.def1.split(",")
+                for (const item of def1Files) {
+                    this.def1Files.push({
+                        name: item,
+                        url: item
+                    })
+                }
+            }
+            if (this.def2 && this.def2_type === "file") {
+                const def2Files = this.def2.split(",")
+                for (const item of def2Files) {
+                    this.def2Files.push({
+                        name: item,
+                        url: item
+                    })
+                }
+            }
+            if (this.def3 && this.def3_type === "file") {
+                const def3Files = this.def3.split(",")
+                for (const item of def3Files) {
+                    this.def3Files.push({
+                        name: item,
+                        url: item
+                    })
+                }
+            }
+        },
+        mounted() {
+            if (this.isList === '1') {
+                originPbootFunc()
+            }
+            if (this.def1_type === 'editor') {
+                this.editor1 = UE.getEditor('editor_1', {
+                    maximumWords: 10000
+                });
+            }
+            if (this.def2_type === 'editor') {
+                this.editor2 = UE.getEditor('editor_2', {
+                    maximumWords: 10000
+                });
+            }
+            if (this.def3_type === 'editor') {
+                this.editor3 = UE.getEditor('editor_3', {
+                    maximumWords: 10000
+                });
+            }
+
+
+
+
+        },
+        methods: {
+            def1HandleRemove(file, fileList) {
+                if (this.def1_type === "img") {
+                    this.def1Imgs = [];
+                } else if (this.def1_type === "file") {
+                    this.def1Files = [];
+                }
+            },
+            def2HandleRemove(file, fileList) {
+                if (this.def2_type === "img") {
+                    this.def2Imgs = [];
+                } else if (this.def2_type === "file") {
+                    this.def2Files = [];
+                }
+            },
+            def3HandleRemove(file, fileList) {
+                if (this.def3_type === "img") {
+                    this.def3Imgs = [];
+                } else if (this.def3_type === "file") {
+                    this.def3Files = [];
+                }
+            },
+            def1HandleSuccess(res, uploadFile) {
+                if (!res.code) {
+                    ELEMENT.Message.error(res.data);
+                } else {
+                    if (this.def1_type === "img") {
+                        this.def1Imgs = []
+                        this.def1Imgs.push({
+                            name: res.data.join(","),
+                            url: res.data.join(",")
+                        })
+                    } else if (this.def1_type === "file") {
+                        this.def1Files = []
+                        this.def1Files.push({
+                            name: res.data.join(","),
+                            url: res.data.join(",")
+                        })
+                    }
+                }
+            },
+            def2HandleSuccess(res, uploadFile) {
+                if (!res.code) {
+                    ELEMENT.Message.error(res.data);
+                } else {
+                    if (this.def2_type === "img") {
+                        this.def2Imgs = [];
+                        this.def2Imgs.push({
+                            name: res.data.join(","),
+                            url: res.data.join(",")
+                        })
+                    } else if (this.def2_type === "file") {
+                        this.def2Files = [];
+                        this.def2Files.push({
+                            name: res.data.join(","),
+                            url: res.data.join(",")
+                        })
+                    }
+                }
+            },
+            def3HandleSuccess(res, uploadFile) {
+                if (!res.code) {
+                    ELEMENT.Message.error(res.data);
+                } else {
+                    if (this.def3_type === "img") {
+                        this.def3Imgs = []
+                        this.def3Imgs.push({
+                            name: res.data.join(","),
+                            url: res.data.join(",")
+                        })
+                    } else if (this.def3_type === "file") {
+                        this.def3Files = []
+                        this.def3Files.push({
+                            name: res.data.join(","),
+                            url: res.data.join(",")
+                        })
+                    }
+                }
+            },
+            defTypeChangeFunc(oldVal, newVal, id) {
+                console.log(oldVal, newVal);
+                // 文本转图片
+                if ((oldVal === 'textarea' || oldVal === 'editor') && newVal === "img") {
+                    if(!this["def" + id]){
+                        return;
+                    }
+                    this["def" + id +"Imgs"] = [{
+                        name: this["def" + id],
+                        url: this["def" + id],
+                    }]
+                }
+                // 文本转附件
+                if ((oldVal === 'textarea' || oldVal === 'editor') && newVal === "file") {
+                    if(!this["def" + id]){
+                        return;
+                    }
+                    // 文字转图片或者附件
+                    console.log(this["def" + id +"Files"]);
+                    this["def" + id +"Files"] = [{
+                        name: this["def" + id],
+                        url: this["def" + id],
+                    }]
+                }
+                // 图片转附件
+                if (oldVal === 'img' && newVal === "file") {
+                    this["def" + id +"Files"] = this["def" + id +"Imgs"]
+                }
+                // 附件转图片
+                if (oldVal === 'file' && newVal === "img") {
+                    this["def" + id +"Imgs"] = this["def" + id +"Files"]
+                }
+                // 如果是转到编辑器
+                if (newVal === 'editor') {
+                    this["editor" + id] = UE.getEditor('editor_' + id, {
+                        maximumWords: 10000
+                    });
+                } else {
+                    this["editor" + id] = null;
+                }
+            }
+        },
+        watch: {
+            def1(data) {
+                this.$refs.def1.value = data;
+            },
+            def2(data) {
+                this.$refs.def2.value = data;
+            },
+            def3(data) {
+                this.$refs.def3.value = data;
+            },
+            def1Imgs(data) {
+                const result = [];
+                for (const item of data) {
+                    result.push(item.url);
+                }
+                this.def1 = result.join(",")
+            },
+            def2Imgs(data) {
+                const result = [];
+                for (const item of data) {
+                    result.push(item.url);
+                }
+                this.def2 = result.join(",")
+            },
+            def3Imgs(data) {
+                const result = [];
+                for (const item of data) {
+                    result.push(item.url);
+                }
+                this.def3 = result.join(",")
+            },
+            def1Files(data) {
+                const result = [];
+                for (const item of data) {
+                    result.push(item.url);
+                }
+                this.def1 = result.join(",")
+            },
+            def2Files(data) {
+                const result = [];
+                for (const item of data) {
+                    result.push(item.url);
+                }
+                this.def2 = result.join(",")
+            },
+            def3Files(data) {
+                const result = [];
+                for (const item of data) {
+                    result.push(item.url);
+                }
+                this.def3 = result.join(",")
+            },
+            def1_type(oldVal, newVal) {
+                this.defTypeChangeFunc(newVal, oldVal, 1)
+            },
+            def2_type(oldVal, newVal) {
+                this.defTypeChangeFunc(newVal, oldVal, 2)
+            },
+            def3_type(oldVal, newVal) {
+                this.defTypeChangeFunc(newVal, oldVal, 3)
+            }
+        }
+    })
+</script>
+{include file='common/foot.html'}

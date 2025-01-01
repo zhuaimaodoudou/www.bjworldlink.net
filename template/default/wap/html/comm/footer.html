@@ -1,0 +1,26 @@
+<div class="footer">
+    {pboot:sitecopyright}
+    <br>
+    <a href="https://www.beian.gov.cn/portal/index.do">{pboot:if('{pboot:siteicp}')}
+    {pboot:siteicp}
+    {/pboot:if}</a>
+</div>
+<img src="/static/upload/image/20240630/1719752401718817.png" alt="" width="65" class="d-menu">
+<div class="cebianlan">
+    <a href="/" class="{pboot:if(0=={sort:scode})}active{/pboot:if}">首页</a>
+    {pboot:nav}
+    <a href="[nav:link]" class="{pboot:if([nav:scode]=={sort:scode})}active{/pboot:if}">[nav:name]</a>
+    {/pboot:nav}
+</div>
+<div class="g-cebianlan"></div>
+<script src="static/js/jquery-3.3.1.min.js"></script>
+<script>
+    $('.d-menu').click(function(){
+        $('.cebianlan').show()
+        $('.g-cebianlan').show()
+    })
+    $('.g-cebianlan').click(function(){
+        $(this).hide()
+        $('.cebianlan').hide()
+    })
+</script>
